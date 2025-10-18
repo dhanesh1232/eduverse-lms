@@ -36,65 +36,83 @@ app.use("/api/assignments", assignmentRoutes);
 app.use("/api/materials", materialRoutes);
 app.use("/api/discussions", discussionRoutes);
 
-// Serve static assets in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/build")));
+// // Serve static assets in production
+// if (process.env.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname, "../client/build")));
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../client", "build", "index.html"));
-  });
-}
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.resolve(__dirname, "../client", "build", "index.html"));
+//   });
+// }
 
 // Dynamic port configuration with automatic port finding
+// const startServer = async () => {
+//   await connectDB();
+//   try {
+//     // Set base port from environment or default to 62000
+//     const basePort = process.env.PORT ? parseInt(process.env.PORT) : 62000;
+
+//     // Find an available port starting from basePort
+//     portfinder.setBasePort(basePort);
+//     const availablePort = await portfinder.getPortPromise();
+
+//     const server = app.listen(availablePort, () => {
+//       const actualPort = server.address().port;
+//       console.log(`🚀 Server running on port ${actualPort}`);
+//       console.log(`📚 Environment: ${process.env.NODE_ENV || "development"}`);
+//       console.log(`🔗 Backend URL: http://localhost:${actualPort}`);
+
+//       // Save the actual port to a file for the frontend to read
+//       const fs = require("fs");
+//       const portConfig = { backendPort: actualPort };
+//       const portConfigPath = path.resolve(
+//         __dirname,
+//         "../client/public/port-config.json"
+//       );
+//       fs.writeFileSync(portConfigPath, JSON.stringify(portConfig, null, 2));
+//       console.log(`💾 Port configuration saved to ${portConfigPath}`);
+//     });
+
+//     // Graceful shutdown handling
+//     process.on("SIGTERM", () => {
+//       console.log("SIGTERM received, shutting down gracefully");
+//       server.close(() => {
+//         console.log("Server closed");
+//         mongoose.connection.close();
+//       });
+//     });
+
+//     process.on("SIGINT", () => {
+//       console.log("SIGINT received, shutting down gracefully");
+//       server.close(() => {
+//         console.log("Server closed");
+//         mongoose.connection.close();
+//         process.exit(0);
+//       });
+//     });
+//   } catch (error) {
+//     console.error("❌ Error starting server:", error);
+//     process.exit(1);
+//   }
+// };
+
 const startServer = async () => {
-  await connectDB();
   try {
-    // Set base port from environment or default to 62000
-    const basePort = process.env.PORT ? parseInt(process.env.PORT) : 62000;
-
-    // Find an available port starting from basePort
-    portfinder.setBasePort(basePort);
-    const availablePort = await portfinder.getPortPromise();
-
-    const server = app.listen(availablePort, () => {
-      const actualPort = server.address().port;
-      console.log(`🚀 Server running on port ${actualPort}`);
-      console.log(`📚 Environment: ${process.env.NODE_ENV || "development"}`);
-      console.log(`🔗 Backend URL: http://localhost:${actualPort}`);
-
-      // Save the actual port to a file for the frontend to read
-      const fs = require("fs");
-      const portConfig = { backendPort: actualPort };
-      const portConfigPath = path.resolve(
-        __dirname,
-        "../client/public/port-config.json"
-      );
-      fs.writeFileSync(portConfigPath, JSON.stringify(portConfig, null, 2));
-      console.log(`💾 Port configuration saved to ${portConfigPath}`);
-    });
-
-    // Graceful shutdown handling
-    process.on("SIGTERM", () => {
-      console.log("SIGTERM received, shutting down gracefully");
-      server.close(() => {
-        console.log("Server closed");
-        mongoose.connection.close();
+    const PORT = process.env.PORT ? parseInt(process.env.PORT) : 62000;
+    await connectDB()
+      .then(() => {
+        console.log("✅ MongoDB connected");
+        app.listen(PORT, () => {
+          console.log(`🚀 Server running on http://localhost:${PORT}`);
+        });
+      })
+      .catch((err) => {
+        console.error("❌ MongoDB connection failed:", err);
+        process.exit(1);
       });
-    });
-
-    process.on("SIGINT", () => {
-      console.log("SIGINT received, shutting down gracefully");
-      server.close(() => {
-        console.log("Server closed");
-        mongoose.connection.close();
-        process.exit(0);
-      });
-    });
-  } catch (error) {
-    console.error("❌ Error starting server:", error);
-    process.exit(1);
+  } catch (err) {
+    console.log(err.message);
   }
 };
-
 // Start the server
 startServer();

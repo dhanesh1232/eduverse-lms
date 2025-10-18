@@ -4,7 +4,6 @@ require("dotenv").config();
 const MONGODB_URI = process.env.MONGODB_URI;
 
 const connectDB = async () => {
-  console.log(MONGODB_URI);
   try {
     // Connect to the in-memory database
     await mongoose.connect(MONGODB_URI, {
