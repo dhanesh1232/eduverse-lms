@@ -13,15 +13,8 @@ const getBackendPort = async () => {
 };
 
 // Dynamic API URL based on port configuration
-let API_URL =
-  process.env.REACT_APP_API_URL || "https://eduverse-lms.onrender.com/";
-
-// If no environment variable is set, use dynamic port detection
-if (!API_URL) {
-  const backendPort =
-    process.env.REACT_APP_BACKEND_PORT || process.env.BACKEND_PORT || 62000;
-  API_URL = `http://localhost:${backendPort}/api`;
-}
+const URL = process.env.REACT_APP_API_URL;
+let API_URL = `${URL}api`;
 
 // Create axios instance with dynamic base URL
 const api = axios.create({
@@ -34,8 +27,8 @@ const api = axios.create({
 
 // Update API base URL dynamically when port config is available
 getBackendPort().then((port) => {
-  if (!process.env.REACT_APP_API_URL) {
-    api.defaults.baseURL = `http://localhost:${port}/api`;
+  if (!process.env.REACT_APP_API_URL || !API_URL) {
+    api.defaults.baseURL = `"https://eduverse-lms.onrender.com/api`;
   }
 });
 
