@@ -13,7 +13,8 @@ const getBackendPort = async () => {
 };
 
 // Dynamic API URL based on port configuration
-let API_URL = process.env.REACT_APP_API_URL;
+let API_URL =
+  process.env.REACT_APP_API_URL || "https://eduverse-lms.onrender.com/";
 
 // If no environment variable is set, use dynamic port detection
 if (!API_URL) {
